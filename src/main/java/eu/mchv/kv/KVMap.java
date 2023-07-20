@@ -1,4 +1,4 @@
-package eu.mchv.telegrambackupdaemon;
+package eu.mchv.kv;
 
 import java.io.Closeable;
 import java.io.IOException;

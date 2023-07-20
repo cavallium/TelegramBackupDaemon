@@ -1,19 +1,24 @@
-package eu.mchv.telegrambackupdaemon;
+package eu.mchv.kv;
 
 import java.io.Closeable;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringJoiner;
+import java.util.stream.Collectors;
 import org.rocksdb.AbstractImmutableNativeReference;
 import org.rocksdb.BlockBasedTableConfig;
 import org.rocksdb.ColumnFamilyDescriptor;
 import org.rocksdb.ColumnFamilyHandle;
+import org.rocksdb.ColumnFamilyOptions;
 import org.rocksdb.CompactionPriority;
+import org.rocksdb.DBOptions;
+import org.rocksdb.InfoLogLevel;
 import org.rocksdb.LRUCache;
 import org.rocksdb.Options;
 import org.rocksdb.RocksDB;
@@ -46,9 +51,33 @@ public class KVDatabase extends AbstractImmutableNativeReference {
 				.setMaxBackgroundJobs(6)
 				.setBytesPerSync(1048576)
 				.setCompactionPriority(CompactionPriority.MinOverlappingRatio)
-				.setCreateMissingColumnFamilies(true);
+				.setCreateMissingColumnFamilies(true)
+				.setInfoLogLevel(InfoLogLevel.WARN_LEVEL)
+				.setKeepLogFileNum(3)
+				.setMaxLogFileSize(10 * SizeUnit.MB);
 
-		this.db = RocksDB.open(options, path.toString());
+		var cfs = RocksDB
+				.listColumnFamilies(options, path.toString())
+				.stream()
+				.map(columnFamilyName -> new ColumnFamilyDescriptor(columnFamilyName, new ColumnFamilyOptions(options)))
+				.collect(Collectors.toCollection(ArrayList::new));
+
+		if (cfs.isEmpty()) {
+			cfs.add(new ColumnFamilyDescriptor(RocksDB.DEFAULT_COLUMN_FAMILY, new ColumnFamilyOptions(options)));
+		}
+
+		var dbOptions = new DBOptions(options);
+
+		var handles = new ArrayList<ColumnFamilyHandle>(cfs.size());
+
+		this.db = RocksDB.open(dbOptions, path.toString(), cfs, handles);
+
+		for (int i = 0; i < cfs.size(); i++) {
+			var cfd = cfs.get(i);
+			var name = new String(cfd.getName(), StandardCharsets.UTF_8);
+			this.descriptorMap.put(name, cfd);
+			this.handleMap.put(name, handles.get(i));
+		}
 	}
 
 	public KVMap<byte[], byte[]> getKVMap(String name) {
