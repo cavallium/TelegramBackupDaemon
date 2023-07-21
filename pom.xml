@@ -26,6 +26,7 @@
 
         <vertx.version>4.4.4</vertx.version>
         <junit-jupiter.version>5.9.1</junit-jupiter.version>
+        <jackson.version>2.15.0</jackson.version>
 
         <main.verticle>eu.mchv.telegrambackupdaemon.MainVerticle</main.verticle>
         <launcher.class>io.vertx.core.Launcher</launcher.class>
@@ -44,6 +45,13 @@
                 <groupId>it.tdlight</groupId>
                 <artifactId>tdlight-java-bom</artifactId>
                 <version>3.0.12+td.1.8.14</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.micrometer</groupId>
+                <artifactId>micrometer-bom</artifactId>
+                <version>1.10.7</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -101,6 +109,36 @@
             <groupId>org.rocksdb</groupId>
             <artifactId>rocksdbjni</artifactId>
             <version>8.3.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>24.0.1</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.warp.filesponge</groupId>
+            <artifactId>FileSponge</artifactId>
+            <version>0.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-core</artifactId>
         </dependency>
     </dependencies>
 

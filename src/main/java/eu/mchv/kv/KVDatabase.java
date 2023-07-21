@@ -110,7 +110,7 @@ public class KVDatabase extends AbstractImmutableNativeReference {
 		}
 	}
 
-	private class KVMapImpl extends AbstractMap<byte[], byte[]> implements KVMap<byte[], byte[]>, Closeable {
+	class KVMapImpl extends AbstractMap<byte[], byte[]> implements KVMap<byte[], byte[]>, Closeable {
 
 		private final AbstractImmutableNativeReference reference = new AbstractImmutableNativeReference(true) {
 			@Override
@@ -218,6 +218,18 @@ public class KVDatabase extends AbstractImmutableNativeReference {
 				}
 			}
 			return entries;
+		}
+
+		public ColumnFamilyHandle getHandle() {
+			return handle;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public RocksDB getDb() {
+			return db;
 		}
 
 		@Override
